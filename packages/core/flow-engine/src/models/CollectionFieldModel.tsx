@@ -76,8 +76,11 @@ export class CollectionFieldModel<T extends DefaultStructure = DefaultStructure>
         return this.fieldPath;
       },
     });
-    this.context.blockModel.addAppends(this.fieldPath);
-    this.context.blockModel.addAppends(this.associationPathName);
+    const blockModel = this.context.blockModel as { addAppends?: (fieldPath?: string) => void } | undefined;
+    // Some imported templates may create field models before blockModel is available.
+    // Guard this to prevent the whole view from crashing on initialization.
+    blockModel?.addAppends?.(this.fieldPath);
+    blockModel?.addAppends?.(this.associationPathName);
   }
 
   getFieldSettingsInitParams(): FieldSettingsInitParams {
